@@ -1,21 +1,24 @@
 Summary: Console-based network traffic monitor
 Name: vnstat
-Version: 2.9
-Release: 2%{?dist}
+Version: 2.13
+Release: 1%{?dist}
 
 License: GPLv2
-URL: http://humdi.net/vnstat/
-Source0: http://humdi.net/vnstat/vnstat-%{version}.tar.gz
+URL: https://humdi.net/vnstat/
+Source0: https://humdi.net/vnstat/%{name}-%{version}.tar.gz
 Patch0: vnstat.service.patch
 Requires(pre): shadow-utils
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
+%{?systemd_requires}
 BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gd-devel
+%if 0%{?rhel} >= 8 || 0%{?fedora}
+BuildRequires: systemd-rpm-macros
+%else
 BuildRequires: systemd
+%endif
 BuildRequires: sqlite-devel
+Obsoletes: vnstat < %{version}-%{release}
 
 %description
 vnStat is a console-based network traffic monitor that keeps a log of daily
@@ -26,6 +29,7 @@ be used without root permissions. See the web-page for few 'screenshots'.
 %package vnstati
 Summary: Image output support for vnstat
 Recommends: %{name} = %{version}-%{release}
+Obsoletes: vnstat-vnstati < %{version}-%{release}
 
 %description vnstati
 The purpose of vnstati is to provide image output support for statistics
@@ -100,6 +104,10 @@ exit 0
 %{_bindir}/vnstati
 
 %changelog
+* Fri Apr 24 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
+- Update to 2.13
+- Modernize spec for EL10
+
 * Wed May 18 2022 Adrian Reber <adrian@lisas.de> - 2.9-2
 - Upgrade to 2.9 (#2044224)
 
