@@ -28,7 +28,9 @@ be used without root permissions. See the web-page for few 'screenshots'.
 
 %package vnstati
 Summary: Image output support for vnstat
+%if 0%{?rhel} >= 8 || 0%{?fedora}
 Recommends: %{name} = %{version}-%{release}
+%endif
 Obsoletes: vnstat-vnstati < %{version}-%{release}
 
 %description vnstati
@@ -51,21 +53,21 @@ sed -i -e "s,/var/run/,/run/vnstat/,g; \
 %{__make} %{?_smp_mflags} CFLAGS="$RPM_OPT_FLAGS" all
 
 %install
-%{__mkdir_p} $RPM_BUILD_ROOT%{_localstatedir}/lib/%{name}
-%{__mkdir_p} $RPM_BUILD_ROOT%{_unitdir}
-%{__mkdir_p} $RPM_BUILD_ROOT%{_tmpfilesdir}
+%{__install} -d %{buildroot}%{_localstatedir}/lib/%{name}
+%{__install} -d %{buildroot}%{_unitdir}
+%{__install} -d %{buildroot}%{_tmpfilesdir}
 
 %{__mkdir_p} %{buildroot}/run/
 %{__install} -d -m 0700 %{buildroot}/run/%{name}/
 
-%{__make} install DESTDIR=$RPM_BUILD_ROOT
-%{__install} -p -m 644 examples/systemd/vnstat.service $RPM_BUILD_ROOT%{_unitdir}/
+%{__make} install DESTDIR=%{buildroot}
+%{__install} -p -m 644 examples/systemd/vnstat.service %{buildroot}%{_unitdir}/
 %{__rm} -rf examples/init.d
 %{__rm} -rf examples/systemd
 %{__rm} -rf examples/launchd
 %{__rm} -rf examples/upstart
 
-%{__cat} >> $RPM_BUILD_ROOT/%{_tmpfilesdir}/%{name}.conf << END
+%{__cat} >> %{buildroot}/%{_tmpfilesdir}/%{name}.conf << END
 D /run/vnstat 0700 vnstat vnstat
 END
 
@@ -104,6 +106,11 @@ exit 0
 %{_bindir}/vnstati
 
 %changelog
+* Fri May 22 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
+- Wrap Recommends in EL8+/Fedora guard in vnstati subpackage
+- Replace deprecated %{__mkdir_p} with %{__install} -d
+- Replace $RPM_BUILD_ROOT with %{buildroot}
+
 * Fri Apr 24 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
 - Update to 2.13
 - Modernize spec for EL10
