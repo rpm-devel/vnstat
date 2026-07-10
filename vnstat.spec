@@ -8,13 +8,20 @@ URL: https://github.com/vergoh/vnstat
 ExclusiveArch: x86_64 aarch64
 Source0: https://github.com/vergoh/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Patch0: vnstat.service.patch
-Requires(pre): shadow-utils
+%if 0%{?suse_version}
+%global shadow_pkg shadow
+%global sqlite_devel_pkg sqlite3-devel
+%else
+%global shadow_pkg shadow-utils
+%global sqlite_devel_pkg sqlite-devel
+%endif
+Requires(pre): %{shadow_pkg}
 %{?systemd_requires}
 BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gd-devel
 BuildRequires: systemd-rpm-macros
-BuildRequires: sqlite-devel
+BuildRequires: %{sqlite_devel_pkg}
 Obsoletes: vnstat < %{version}-%{release}
 
 %description
@@ -102,6 +109,12 @@ exit 0
 %{_bindir}/vnstati
 
 %changelog
+* Sat Jul 05 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
+- Guard Requires(pre) package name: shadow-utils (RHEL/Fedora) vs shadow (SUSE)
+- Guard sqlite BuildRequires: sqlite-devel (RHEL/Fedora) vs sqlite3-devel (SUSE)
+- Verified gd-devel and systemd-rpm-macros package names are identical on
+  openSUSE/SLES; left unguarded
+
 * Sat Jul 05 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
 - URL/Source0: humdi.net -> https://github.com/vergoh/vnstat
 - Verified 2.13 is latest upstream release; Source0 downloadable
