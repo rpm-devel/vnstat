@@ -3,20 +3,17 @@ Name: vnstat
 Version: 2.13
 Release: 1%{?dist}
 
-License: GPLv2
-URL: https://humdi.net/vnstat/
-Source0: https://humdi.net/vnstat/%{name}-%{version}.tar.gz
+License: GPL-2.0-only
+URL: https://github.com/vergoh/vnstat
+ExclusiveArch: x86_64 aarch64
+Source0: https://github.com/vergoh/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Patch0: vnstat.service.patch
 Requires(pre): shadow-utils
 %{?systemd_requires}
 BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gd-devel
-%if 0%{?rhel} >= 8 || 0%{?fedora}
 BuildRequires: systemd-rpm-macros
-%else
-BuildRequires: systemd
-%endif
 BuildRequires: sqlite-devel
 Obsoletes: vnstat < %{version}-%{release}
 
@@ -40,8 +37,7 @@ outputs of vnStat are supported excluding live traffic features. The image can
 be outputted either to a file or to standard output.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 # disable maximum bandwidth setting and change pidfile location
 sed -i -e "s,/var/run/,/run/vnstat/,g; \
@@ -49,8 +45,8 @@ sed -i -e "s,/var/run/,/run/vnstat/,g; \
 	cfg/vnstat.conf
 
 %build
-%{configure}
-%{__make} %{?_smp_mflags} CFLAGS="$RPM_OPT_FLAGS" all
+%configure
+%make_build CFLAGS="%{optflags}" all
 
 %install
 %{__install} -d %{buildroot}%{_localstatedir}/lib/%{name}
@@ -60,7 +56,7 @@ sed -i -e "s,/var/run/,/run/vnstat/,g; \
 %{__mkdir_p} %{buildroot}/run/
 %{__install} -d -m 0700 %{buildroot}/run/%{name}/
 
-%{__make} install DESTDIR=%{buildroot}
+%make_install
 %{__install} -p -m 644 examples/systemd/vnstat.service %{buildroot}%{_unitdir}/
 %{__rm} -rf examples/init.d
 %{__rm} -rf examples/systemd
@@ -106,6 +102,16 @@ exit 0
 %{_bindir}/vnstati
 
 %changelog
+* Sat Jul 05 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
+- URL/Source0: humdi.net -> https://github.com/vergoh/vnstat
+- Verified 2.13 is latest upstream release; Source0 downloadable
+- Verified Patch0 (vnstat.service.patch) present and referenced
+
+* Thu Jul 03 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
+- SPDX: GPLv2 -> GPL-2.0-only; add ExclusiveArch: x86_64 aarch64
+- Drop rhel/fedora conditional; BuildRequires: systemd-rpm-macros unconditionally
+- %%autosetup -p1; %%make_build; %%make_install
+
 * Fri May 22 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
 - Wrap Recommends in EL8+/Fedora guard in vnstati subpackage
 - Replace deprecated %{__mkdir_p} with %{__install} -d
