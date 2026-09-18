@@ -33,7 +33,7 @@ be used without root permissions. See the web-page for few 'screenshots'.
 %package vnstati
 Summary: Image output support for vnstat
 %if 0%{?rhel} >= 8 || 0%{?fedora}
-Recommends: %{name} = %{version}-%{release}
+Recommends: %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 %endif
 Obsoletes: vnstat-vnstati < %{version}-%{release}
 
@@ -109,18 +109,18 @@ exit 0
 %{_bindir}/vnstati
 
 %changelog
-* Sat Jul 05 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
+* Sun Jul 05 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
 - Guard Requires(pre) package name: shadow-utils (RHEL/Fedora) vs shadow (SUSE)
 - Guard sqlite BuildRequires: sqlite-devel (RHEL/Fedora) vs sqlite3-devel (SUSE)
 - Verified gd-devel and systemd-rpm-macros package names are identical on
   openSUSE/SLES; left unguarded
 
-* Sat Jul 05 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
+* Sun Jul 05 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
 - URL/Source0: humdi.net -> https://github.com/vergoh/vnstat
 - Verified 2.13 is latest upstream release; Source0 downloadable
 - Verified Patch0 (vnstat.service.patch) present and referenced
 
-* Thu Jul 03 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
+* Fri Jul 03 2026 CasjaysDev <rpm-devel@casjaysdev.pro> - 2.13-1
 - SPDX: GPLv2 -> GPL-2.0-only; add ExclusiveArch: x86_64 aarch64
 - Drop rhel/fedora conditional; BuildRequires: systemd-rpm-macros unconditionally
 - %%autosetup -p1; %%make_build; %%make_install
